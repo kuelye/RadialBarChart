@@ -7,7 +7,30 @@
     >
 
     <com.kuelye.radialbarchart.library.RadialBarChartView
+        android:id="@id/showcase_activity_radialbarchartview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         />
+
+    <SeekBar
+        android:id="@+id/showcase_activity_start_angle_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:max="360"/>
+
+    <SeekBar
+        android:id="@+id/showcase_activity_end_angle_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:max="360"/>
+
+    <SeekBar
+        android:id="@+id/showcase_activity_radius_modifier_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:max="100"/>
 </LinearLayout>
