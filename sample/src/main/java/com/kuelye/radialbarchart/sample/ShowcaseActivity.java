@@ -50,12 +50,21 @@ public class ShowcaseActivity extends Activity {
       }
 
     });
-    final SeekBar radiusModifierSeekBar = (SeekBar) findViewById(R.id.showcase_activity_radius_modifier_seekbar);
-    radiusModifierSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
+    final SeekBar radiusModifierFromSeekBar = (SeekBar) findViewById(R.id.showcase_activity_radius_from_modifier_seekbar);
+    radiusModifierFromSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
 
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        radialBarChartView.updateRadiusModifier(progress / 100f);
+        radialBarChartView.updateRadiusFromModifier(progress / 100f);
+      }
+
+    });
+    final SeekBar radiusModifierToSeekBar = (SeekBar) findViewById(R.id.showcase_activity_radius_to_modifier_seekbar);
+    radiusModifierToSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
+
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        radialBarChartView.updateRadiusToModifier(progress / 100f);
       }
 
     });

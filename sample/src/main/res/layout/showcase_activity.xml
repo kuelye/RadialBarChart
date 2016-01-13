@@ -18,19 +18,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:max="360"/>
+        android:progress="360"
+        android:max="720"/>
 
     <SeekBar
         android:id="@+id/showcase_activity_end_angle_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:max="360"/>
+        android:progress="450"
+        android:max="720"/>
 
     <SeekBar
-        android:id="@+id/showcase_activity_radius_modifier_seekbar"
+        android:id="@+id/showcase_activity_radius_from_modifier_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:progress="50"
+        android:max="100"/>
+
+    <SeekBar
+        android:id="@+id/showcase_activity_radius_to_modifier_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:progress="75"
         android:max="100"/>
 </LinearLayout>
