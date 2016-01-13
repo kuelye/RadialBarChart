@@ -59,14 +59,15 @@ public class RadialBarChartView extends View {
     final int chartCenterX = (chartViewLeft + chartViewRight) / 2;
     final int chartCenterY = (chartViewTop + chartViewBottom) / 2;
     final int chartSize = Math.min(chartViewRight - chartViewLeft, chartViewBottom - chartViewTop);
-    final float r = chartSize * mRadiusFromModifier / 2f;
+    final float rFrom = chartSize * mRadiusFromModifier / 2f;
+    final float rTo = chartSize * mRadiusToModifier / 2f;
     final int xc = chartCenterX;
     final int yc = chartCenterY;
 
     drawMarker(canvas, chartCenterX, chartCenterY);
 
     final Path path = new Path();
-    DrawUtils.addArcCurveToPath(path, xc, yc, r, (float) mStartAngle, (float) mEndAngle);
+    DrawUtils.addArcToPath(path, xc, yc, rFrom, rTo, (float) mStartAngle, (float) mEndAngle);
 
     canvas.drawPath(path, mPaint);
   }

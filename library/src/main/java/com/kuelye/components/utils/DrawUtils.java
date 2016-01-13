@@ -16,7 +16,6 @@ package com.kuelye.components.utils;/*
 
 import android.graphics.Path;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
@@ -28,14 +27,21 @@ public final class DrawUtils {
 
   public static void addArcToPath(@NonNull Path path, float xCenter, float yCenter
       , float radiusFrom, float radiusTo, float angleFrom, float angleTo) {
-
+    path.moveTo((float) (xCenter + radiusFrom * cos(toRadians(angleFrom)))
+        , (float) (yCenter - radiusFrom * sin(toRadians(angleFrom))));
+    path.lineTo((float) (xCenter + radiusTo * cos(toRadians(angleFrom)))
+        , (float) (yCenter - radiusTo * sin(toRadians(angleFrom))));
+    pathArcAsCurveTo(path, xCenter, yCenter, radiusTo, angleFrom, angleTo);
+    path.lineTo((float) (xCenter + radiusFrom * cos(toRadians(angleTo)))
+        , (float) (yCenter - radiusFrom * sin(toRadians(angleFrom))));
+    pathArcAsCurveTo(path, xCenter, yCenter, radiusFrom, angleTo, angleFrom);
   }
 
   /**
    * @param angleFrom In degrees in the standard polar coordinate system.
    * @param angleTo In degrees in the standard polar coordinate system.
    */
-  public static void addArcCurveToPath(@NonNull Path path, float xCenter, float yCenter
+  public static void pathArcAsCurveTo(@NonNull Path path, float xCenter, float yCenter
       , float radius, float angleFrom, float angleTo) {
     float angleIterationFrom = angleFrom, angleIterationTo;
     float dAngle = angleTo - angleFrom;
@@ -43,7 +49,6 @@ public final class DrawUtils {
       dAngle = 360;
     }
 
-    String msg = angleFrom + " -> " + angleTo + " | ";
     while (dAngle != 0) {
       if (abs(dAngle) > 90) {
         angleIterationTo = angleIterationFrom + signum(dAngle) * 90;
@@ -52,18 +57,16 @@ public final class DrawUtils {
         angleIterationTo = angleIterationFrom + dAngle;
         dAngle = 0;
       }
-      msg += angleIterationFrom + " -> " + angleIterationTo + ", ";
 
       final float xFrom = (float) (xCenter + radius * cos(angleIterationFrom * PI / 180));
       final float yFrom = (float) (yCenter - radius * sin(angleIterationFrom * PI / 180));
       final float xTo = (float) (xCenter + radius * cos(angleIterationTo * PI / 180));
       final float yTo = (float) (yCenter - radius * sin(angleIterationTo * PI / 180));
 
-      addBezierArcCurveToPath(path, xCenter, yCenter, xFrom, yFrom, xTo, yTo);
+      pathArcAsBezierCurveTo(path, xTo, yTo, xFrom, yFrom, xCenter, yCenter);
 
       angleIterationFrom = angleIterationTo;
     }
-    Log.w("GUB", msg);
   }
 
   /**
@@ -79,11 +82,21 @@ public final class DrawUtils {
 
     return angle;
   }
+  /**
+   * @param angle In degrees.
+   * @return In radians.
+   */
+  public static double toRadians(float angle) {
+    return angle * PI / 180;
+  }
 
   /* ============================ INNER ============================= */
 
-  private static void addBezierArcCurveToPath(@NonNull Path path, float xCenter, float yCenter
-      , float xFrom, float yFrom, float xTo, float yTo) {
+  /**
+   * The last point of the current contour should be equal to (xFrom, yFrom).
+   */
+  private static void pathArcAsBezierCurveTo(@NonNull Path path, float xTo, float yTo
+      , float xFrom, float yFrom, float xCenter, float yCenter) {
     final double ax = xFrom - xCenter;
     final double ay = yFrom - yCenter;
     final double bx = xTo - xCenter;
@@ -97,7 +110,7 @@ public final class DrawUtils {
     final float xc2 = (float) (xCenter + bx + k2 * by);
     final float yc2 = (float) (yCenter + by - k2 * bx);
 
-    path.moveTo(xFrom, yFrom);
+    path.lineTo(xFrom, yFrom); // TODO :(
     path.cubicTo(xc1, yc1, xc2, yc2, xTo, yTo);
   }
 
