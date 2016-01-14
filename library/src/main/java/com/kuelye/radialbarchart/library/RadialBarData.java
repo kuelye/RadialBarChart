@@ -34,24 +34,39 @@ public class RadialBarData {
     return mValue;
   }
 
+  @Override
+  public String toString() {
+    return "RadialBarData{" +
+        "mLevel=" + mLevel +
+        ", mValue=" + mValue +
+        '}';
+  }
+
   /* =========================== INNER ============================== */
 
   public static class Builder {
 
     private int mLevel = 0;
-
     private float mValue = 0;
 
     public Builder() {
       // stub
     }
 
-    public void setValue(float value) {
+    public Builder setValue(float value) {
       mValue = value;
+
+      return this;
     }
 
-    public void setLevel(int level) {
+    public Builder setLevel(int level) {
       mLevel = level;
+
+      return this;
+    }
+
+    public RadialBarData build() {
+      return new RadialBarData(this);
     }
 
   }

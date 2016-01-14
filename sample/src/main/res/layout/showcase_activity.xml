@@ -13,21 +13,13 @@
         android:layout_weight="1"
         />
 
-    <SeekBar
-        android:id="@+id/showcase_activity_start_angle_seekbar"
+    <Button
+        android:id="@+id/showcase_activity_update_datas_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:progress="360"
-        android:max="720"/>
-
-    <SeekBar
-        android:id="@+id/showcase_activity_end_angle_seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:progress="450"
-        android:max="720"/>
+        android:text="Update datas"
+        />
 
     <SeekBar
         android:id="@+id/showcase_activity_radius_from_modifier_seekbar"

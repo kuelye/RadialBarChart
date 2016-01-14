@@ -23,21 +23,18 @@ import android.graphics.Path;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-
-import com.kuelye.components.utils.DrawUtils;
 
 import java.util.List;
 
-import static java.lang.Math.PI;
+import static com.kuelye.components.utils.DrawUtils.addArcToPath;
 
 public class RadialBarChartView extends View {
 
   @NonNull private Paint mPaint;
-  @Nullable private List<RadialBarData> mData;
+  @Nullable private List<RadialBarData> mDatas;
 
-  private double mStartAngle = 0;
-  private double mEndAngle = 90;
   private float mRadiusFromModifier = 0.5f;
   private float mRadiusToModifier = 0.75f;
 
@@ -52,40 +49,43 @@ public class RadialBarChartView extends View {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    final int chartViewTop = getPaddingTop();
-    final int chartViewBottom = getMeasuredHeight() - getPaddingBottom();
-    final int chartViewLeft = getPaddingLeft();
-    final int chartViewRight = getMeasuredWidth() - getPaddingRight();
-    final int chartCenterX = (chartViewLeft + chartViewRight) / 2;
-    final int chartCenterY = (chartViewTop + chartViewBottom) / 2;
-    final int chartSize = Math.min(chartViewRight - chartViewLeft, chartViewBottom - chartViewTop);
-    final float rFrom = chartSize * mRadiusFromModifier / 2f;
-    final float rTo = chartSize * mRadiusToModifier / 2f;
-    final int xc = chartCenterX;
-    final int yc = chartCenterY;
+    float valuesSum = 0f;
+    if (mDatas != null) {
+      for (RadialBarData data : mDatas) {
+        valuesSum += data.getValue();
+      }
+    }
 
-    drawMarker(canvas, chartCenterX, chartCenterY);
+    if (valuesSum != 0) {
+      final int chartViewTop = getPaddingTop();
+      final int chartViewBottom = getMeasuredHeight() - getPaddingBottom();
+      final int chartViewLeft = getPaddingLeft();
+      final int chartViewRight = getMeasuredWidth() - getPaddingRight();
+      final int chartCenterX = (chartViewLeft + chartViewRight) / 2;
+      final int chartCenterY = (chartViewTop + chartViewBottom) / 2;
+      final int chartSize = Math.min(chartViewRight - chartViewLeft, chartViewBottom - chartViewTop);
+      final float rFrom = chartSize * mRadiusFromModifier / 2f;
+      final float rTo = chartSize * mRadiusToModifier / 2f;
+      final int xc = chartCenterX;
+      final int yc = chartCenterY;
 
-    final Path path = new Path();
-    DrawUtils.addArcToPath(path, xc, yc, rFrom, rTo, (float) mStartAngle, (float) mEndAngle);
+      final Path path = new Path();
+      float startAngle = 0, endAngle;
+      for (RadialBarData data : mDatas) {
+        endAngle = startAngle + data.getValue() / valuesSum * 360;
+        path.reset();
+        Log.w("GUB", "% " + startAngle + " / " + endAngle);
+        addArcToPath(path, xc, yc, rFrom, rTo, startAngle, endAngle);
+        mPaint.setColor(0xff000000 + (int) (Math.random() * 0xffffff));
+        canvas.drawPath(path, mPaint);
+        startAngle = endAngle;
+      }
 
-    canvas.drawPath(path, mPaint);
+    }
   }
 
-  public void updateData(List<RadialBarData> data) {
-    mData = data;
-
-    notifyDataUpdated();
-  }
-
-  public void updateStartAngle(int startAngle) {
-    mStartAngle = startAngle;
-
-    notifyDataUpdated();
-  }
-
-  public void updateEndAngle(int endAngle) {
-    mEndAngle = endAngle;
+  public void updateDatas(List<RadialBarData> datas) {
+    mDatas = datas;
 
     notifyDataUpdated();
   }
@@ -107,10 +107,6 @@ public class RadialBarChartView extends View {
   }
 
   /* ========================== HIDDEN ============================== */
-
-  private void drawRadialBar() {
-
-  }
 
   private void drawMarker(@NonNull Canvas canvas, float x, float y) {
     final Paint markerPaint = new Paint(0);

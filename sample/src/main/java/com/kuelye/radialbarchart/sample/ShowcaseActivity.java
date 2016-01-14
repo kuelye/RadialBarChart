@@ -19,9 +19,16 @@ package com.kuelye.radialbarchart.sample;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
 
 import com.kuelye.radialbarchart.library.RadialBarChartView;
+import com.kuelye.radialbarchart.library.RadialBarData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowcaseActivity extends Activity {
 
@@ -32,23 +39,18 @@ public class ShowcaseActivity extends Activity {
 
     final RadialBarChartView radialBarChartView
         = (RadialBarChartView) findViewById(R.id.showcase_activity_radialbarchartview);
-    final SeekBar startAngleSeekBar = (SeekBar) findViewById(R.id.showcase_activity_start_angle_seekbar);
-    startAngleSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
-
+    final Button updateDatasButton = (Button) findViewById(R.id.showcase_activity_update_datas_button);
+    updateDatasButton.setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        radialBarChartView.updateStartAngle(progress);
+      public void onClick(View v) {
+        final List<RadialBarData> newDatas = new ArrayList<RadialBarData>();
+        for (int i = 0; i < Math.random() * 10; ++i) {
+          newDatas.add(new RadialBarData.Builder().setValue((float) Math.random()).build());
+        }
+
+        Log.w("GUB", "# " + newDatas);
+        radialBarChartView.updateDatas(newDatas);
       }
-
-    });
-    final SeekBar endAngleSeekBar = (SeekBar) findViewById(R.id.showcase_activity_end_angle_seekbar);
-    endAngleSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
-
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        radialBarChartView.updateEndAngle(progress);
-      }
-
     });
     final SeekBar radiusModifierFromSeekBar = (SeekBar) findViewById(R.id.showcase_activity_radius_from_modifier_seekbar);
     radiusModifierFromSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListenerStub() {
