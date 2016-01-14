@@ -1,4 +1,6 @@
-package com.kuelye.components.utils;/*
+package com.kuelye.components.utils;
+
+/*
  * Copyright 2016 Alexey Leshchuk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +19,7 @@ package com.kuelye.components.utils;/*
 import android.graphics.Path;
 import android.support.annotation.NonNull;
 
+import static com.kuelye.components.utils.MathUtils.toRadians;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
@@ -25,78 +28,68 @@ import static java.lang.Math.sin;
 
 public final class DrawUtils {
 
+  /**
+   * @param angleFrom In degrees.
+   * @param angleTo In degrees.
+   */
   public static void addArcToPath(@NonNull Path path, float xCenter, float yCenter
       , float radiusFrom, float radiusTo, float angleFrom, float angleTo) {
-    path.moveTo((float) (xCenter + radiusFrom * cos(toRadians(angleFrom)))
-        , (float) (yCenter - radiusFrom * sin(toRadians(angleFrom))));
-    path.lineTo((float) (xCenter + radiusTo * cos(toRadians(angleFrom)))
-        , (float) (yCenter - radiusTo * sin(toRadians(angleFrom))));
-    pathArcAsCurveTo(path, xCenter, yCenter, radiusTo, angleFrom, angleTo);
-    path.lineTo((float) (xCenter + radiusFrom * cos(toRadians(angleTo)))
-        , (float) (yCenter - radiusFrom * sin(toRadians(angleFrom))));
-    pathArcAsCurveTo(path, xCenter, yCenter, radiusFrom, angleTo, angleFrom);
-  }
-
-  /**
-   * @param angleFrom In degrees in the standard polar coordinate system.
-   * @param angleTo In degrees in the standard polar coordinate system.
-   */
-  public static void pathArcAsCurveTo(@NonNull Path path, float xCenter, float yCenter
-      , float radius, float angleFrom, float angleTo) {
-    float angleIterationFrom = angleFrom, angleIterationTo;
-    float dAngle = angleTo - angleFrom;
-    if (abs(dAngle) > 360) {
-      dAngle = 360;
+    if (abs(angleTo - angleFrom) > 360) {
+      angleTo = angleFrom + 360;
     }
+    final double angleFromInRadians = toRadians(angleFrom);
+    final double angleToInRadians = toRadians(angleTo);
 
-    while (dAngle != 0) {
-      if (abs(dAngle) > 90) {
-        angleIterationTo = angleIterationFrom + signum(dAngle) * 90;
-        dAngle -= signum(dAngle) * 90;
-      } else {
-        angleIterationTo = angleIterationFrom + dAngle;
-        dAngle = 0;
-      }
-
-      final float xFrom = (float) (xCenter + radius * cos(angleIterationFrom * PI / 180));
-      final float yFrom = (float) (yCenter - radius * sin(angleIterationFrom * PI / 180));
-      final float xTo = (float) (xCenter + radius * cos(angleIterationTo * PI / 180));
-      final float yTo = (float) (yCenter - radius * sin(angleIterationTo * PI / 180));
-
-      pathArcAsBezierCurveTo(path, xTo, yTo, xFrom, yFrom, xCenter, yCenter);
-
-      angleIterationFrom = angleIterationTo;
-    }
-  }
-
-  /**
-   * To the range 0° <= angle < 360°.
-   * @param angle In degrees.
-   * @return In degrees.
-   */
-  public static float normalizeDegrees(float angle) {
-    angle %= 360;
-    if (angle < 0f) {
-      angle += 360;
-    }
-
-    return angle;
-  }
-  /**
-   * @param angle In degrees.
-   * @return In radians.
-   */
-  public static double toRadians(float angle) {
-    return angle * PI / 180;
+    path.moveTo((float) (xCenter + radiusFrom * cos(angleFromInRadians))
+        , (float) (yCenter - radiusFrom * sin(angleFromInRadians)));
+    path.lineTo((float) (xCenter + radiusTo * cos(angleFromInRadians))
+        , (float) (yCenter - radiusTo * sin(angleFromInRadians)));
+    pathArcAsBezierCurveComplexTo(path, xCenter, yCenter, radiusTo, angleFrom, angleTo);
+    path.lineTo((float) (xCenter + radiusFrom * cos(angleToInRadians))
+        , (float) (yCenter - radiusFrom * sin(angleToInRadians)));
+    pathArcAsBezierCurveComplexTo(path, xCenter, yCenter, radiusFrom, angleTo, angleFrom);
   }
 
   /* ============================ INNER ============================= */
 
   /**
+   * @param angleFrom In degrees in the standard polar coordinate system.
+   * @param angleTo In degrees in the standard polar coordinate system.
+   */
+  public static void pathArcAsBezierCurveComplexTo(@NonNull Path path, float xCenter, float yCenter
+      , float radius, float angleFrom, float angleTo) {
+    if (radius > 0) {
+      float angleIterationFrom = angleFrom, angleIterationTo;
+      float dAngle = angleTo - angleFrom;
+      if (abs(dAngle) > 360) {
+        dAngle = 360;
+      }
+
+      while (dAngle != 0) {
+        if (abs(dAngle) > 90) {
+          angleIterationTo = angleIterationFrom + signum(dAngle) * 90;
+          dAngle -= signum(dAngle) * 90;
+        } else {
+          angleIterationTo = angleIterationFrom + dAngle;
+          dAngle = 0;
+        }
+
+        final float xFrom = (float) (xCenter + radius * cos(angleIterationFrom * PI / 180));
+        final float yFrom = (float) (yCenter - radius * sin(angleIterationFrom * PI / 180));
+        final float xTo = (float) (xCenter + radius * cos(angleIterationTo * PI / 180));
+        final float yTo = (float) (yCenter - radius * sin(angleIterationTo * PI / 180));
+
+        pathArcAsBezierCurveTo(path, xCenter, yCenter, xFrom, yFrom, xTo, yTo);
+
+        angleIterationFrom = angleIterationTo;
+      }
+    }
+  }
+  /**
    * The last point of the current contour should be equal to (xFrom, yFrom).
    */
-  private static void pathArcAsBezierCurveTo(@NonNull Path path, float xTo, float yTo
-      , float xFrom, float yFrom, float xCenter, float yCenter) {
+  private static void pathArcAsBezierCurveTo(@NonNull Path path, float xCenter, float yCenter
+      , float xFrom, float yFrom, float xTo, float yTo) {
     final double ax = xFrom - xCenter;
     final double ay = yFrom - yCenter;
     final double bx = xTo - xCenter;
@@ -110,7 +103,6 @@ public final class DrawUtils {
     final float xc2 = (float) (xCenter + bx + k2 * by);
     final float yc2 = (float) (yCenter + by - k2 * bx);
 
-    path.lineTo(xFrom, yFrom); // TODO :(
     path.cubicTo(xc1, yc1, xc2, yc2, xTo, yTo);
   }
 
